@@ -1,0 +1,495 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Cinephile</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --bg-main: #020617;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --blue-main: #2563eb;
+            --blue-hover: #1d4ed8;
+            --border-soft: rgba(148, 163, 184, 0.18);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-family: Arial, Helvetica, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .cine-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(2, 6, 23, 0.88);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border-soft);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+        }
+
+        .cine-nav-container {
+            width: min(1450px, 94%);
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 76px;
+            gap: 24px;
+            position: relative;
+        }
+
+        .cine-top-row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .cine-brand-area {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .cine-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 950;
+            letter-spacing: 1px;
+            font-size: 22px;
+        }
+
+        .cine-brand:hover {
+            color: white;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            display: grid;
+            place-items: center;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.38);
+            font-size: 20px;
+        }
+
+        .brand-text span {
+            color: #93c5fd;
+        }
+
+        .cine-category-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cine-category-btn {
+            color: #dbeafe;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 14px;
+            padding: 9px 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(147, 197, 253, 0.28);
+            background: rgba(255, 255, 255, 0.06);
+            transition: 0.2s ease;
+        }
+
+        .cine-category-btn:hover {
+            color: white;
+            background: rgba(37, 99, 235, 0.85);
+            border-color: rgba(147, 197, 253, 0.55);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28);
+        }
+
+        .cine-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .cine-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 10px 15px;
+            border-radius: 999px;
+            transition: 0.2s ease;
+        }
+
+        .cine-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.10);
+        }
+
+        .cine-link-primary {
+            background: var(--blue-main);
+            color: white;
+            box-shadow: 0 12px 28px rgba(37,99,235,0.28);
+        }
+
+        .cine-link-primary:hover {
+            background: var(--blue-hover);
+            color: white;
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            display: grid;
+            place-items: center;
+            transition: 0.2s ease;
+        }
+
+        .search-icon-btn:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .search-lens {
+            width: 17px;
+            height: 17px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            position: relative;
+            display: inline-block;
+        }
+
+        .search-lens::after {
+            content: "";
+            width: 8px;
+            height: 2px;
+            background: #cbd5e1;
+            position: absolute;
+            right: -6px;
+            bottom: -4px;
+            transform: rotate(45deg);
+            border-radius: 999px;
+        }
+
+        .search-icon-btn:hover .search-lens {
+            border-color: #ffffff;
+        }
+
+        .search-icon-btn:hover .search-lens::after {
+            background: #ffffff;
+        }
+        
+        .search-panel {
+            position: absolute;
+            top: 58px;
+            right: 0;
+            width: min(720px, 92vw);
+            background: rgba(15, 23, 42, 0.97);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.60);
+            border-radius: 24px;
+            padding: 18px;
+            display: none;
+            backdrop-filter: blur(18px);
+        }
+
+        .search-panel.show {
+            display: block;
+        }
+
+        .search-panel-title {
+            color: #bfdbfe;
+            font-weight: 900;
+            margin-bottom: 14px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-panel input,
+        .search-panel select {
+            background: #020617;
+            color: white;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            height: 45px;
+        }
+
+        .search-panel input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-panel input:focus,
+        .search-panel select:focus {
+            background: #020617;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: none;
+        }
+
+        .search-submit {
+            border: none;
+            border-radius: 14px;
+            background: #2563eb;
+            color: white;
+            height: 45px;
+            font-weight: 900;
+            width: 100%;
+        }
+
+        .search-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .cine-main {
+            min-height: calc(100vh - 76px);
+            background:
+                radial-gradient(circle at top left, rgba(37,99,235,0.12), transparent 32%),
+                radial-gradient(circle at top right, rgba(124,58,237,0.10), transparent 28%),
+                var(--bg-main);
+        }
+
+        .cine-footer {
+            background: #020617;
+            border-top: 1px solid var(--border-soft);
+            color: var(--text-muted);
+            padding: 22px 0;
+            font-size: 14px;
+        }
+
+        .cine-footer-container {
+            width: min(1450px, 94%);
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand {
+            color: #93c5fd;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid var(--border-soft);
+            color: white;
+            border-radius: 12px;
+            padding: 9px 12px;
+            font-weight: 900;
+        }
+
+        @@media (max-width: 1100px) {
+            .cine-nav-container {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 16px 0;
+            }
+
+            .cine-top-row {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .cine-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cine-links.show {
+                display: flex;
+            }
+
+            .cine-link {
+                width: 100%;
+                text-align: center;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+
+            .search-icon-btn {
+                width: 100%;
+            }
+
+            .search-panel {
+                position: static;
+                width: 100%;
+                margin-top: 12px;
+            }
+        }
+
+        @@media (max-width: 650px) {
+            .cine-brand-area {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .cine-category-buttons {
+                flex-wrap: wrap;
+            }
+
+            .cine-category-btn {
+                font-size: 13px;
+                padding: 8px 15px;
+            }
+        }
+
+        @@media (min-width: 1101px) {
+            .cine-top-row {
+                display: flex;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="cine-navbar">
+        <nav class="cine-nav-container">
+
+            <div class="cine-top-row">
+                <div class="cine-brand-area">
+                    <a class="cine-brand" asp-controller="Contenido" asp-action="Index">
+                        <div class="brand-icon">▶</div>
+                        <div class="brand-text">CINE<span>PHILE</span></div>
+                    </a>
+
+                    <div class="cine-category-buttons">
+                        <a class="cine-category-btn" asp-controller="Contenido" asp-action="Index" asp-route-tipo="Película">Películas</a>
+                        <a class="cine-category-btn" asp-controller="Contenido" asp-action="Index" asp-route-tipo="Serie">Series</a>
+                    </div>
+                </div>
+
+                <button class="mobile-menu-btn" type="button" onclick="toggleMenu()">
+                    ☰
+                </button>
+            </div>
+
+            <div class="cine-links" id="cineMenu">
+                <a class="cine-link" asp-controller="Contenido" asp-action="Index">Inicio</a>
+                <a class="cine-link" asp-controller="Contenido" asp-action="Registros">Registros</a>
+                <a class="cine-link" asp-controller="Contenido" asp-action="Estadisticas">Estadísticas</a>
+
+                <div class="search-wrapper">
+                    <button class="search-icon-btn" type="button" onclick="toggleSearch()" aria-label="Buscar">
+                        <span class="search-lens"></span>
+                    </button>
+
+                    <div class="search-panel" id="searchPanel">
+                        <div class="search-panel-title">Buscar en el catálogo</div>
+
+                        <form asp-controller="Contenido" asp-action="Index" method="get">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <input type="text" name="buscar" class="form-control" placeholder="Título..." />
+                                </div>
+
+                                <div class="col-md-2">
+                                    <select name="tipo" class="form-control">
+                                        <option value="">Tipo</option>
+                                        <option value="Película">Película</option>
+                                        <option value="Serie">Serie</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <input type="text" name="genero" class="form-control" placeholder="Género..." />
+                                </div>
+
+                                <div class="col-md-2">
+                                    <input type="text" name="plataforma" class="form-control" placeholder="Plataforma..." />
+                                </div>
+
+                                <div class="col-md-2">
+                                    <button type="submit" class="search-submit">Filtrar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <a class="cine-link cine-link-primary" asp-controller="Contenido" asp-action="Create">Agregar contenido</a>
+            </div>
+
+        </nav>
+    </header>
+
+    <main class="cine-main">
+        @RenderBody()
+    </main>
+
+    <footer class="cine-footer">
+        <div class="cine-footer-container">
+            <div>
+                <span class="footer-brand">CINEPHILE</span> — Catálogo web de series y películas
+            </div>
+
+            <div>
+                ASP.NET Core MVC • C# • Arquitectura por capas
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById("cineMenu");
+            menu.classList.toggle("show");
+        }
+
+        function toggleSearch() {
+            const panel = document.getElementById("searchPanel");
+            panel.classList.toggle("show");
+        }
+
+        document.addEventListener("click", function (e) {
+            const wrapper = document.querySelector(".search-wrapper");
+            const panel = document.getElementById("searchPanel");
+
+            if (wrapper && panel && !wrapper.contains(e.target)) {
+                panel.classList.remove("show");
+            }
+        });
+    </script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

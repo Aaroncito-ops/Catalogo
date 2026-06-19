@@ -1,0 +1,418 @@
+@model List<CatalogoWeb.Entities.Contenido>
+
+@{
+    ViewData["Title"] = "Registros";
+}
+
+@functions {
+    string Estrellas(int calificacion)
+    {
+        if (calificacion < 1) calificacion = 1;
+        if (calificacion > 5) calificacion = 5;
+
+        return new string('★', calificacion) + new string('☆', 5 - calificacion);
+    }
+}
+
+<style>
+    body {
+        background: #020617;
+        color: #ffffff;
+    }
+
+    .records-page {
+        min-height: 100vh;
+        padding: 55px 0 80px 0;
+        background:
+            radial-gradient(circle at top left, rgba(37,99,235,0.30), transparent 32%),
+            radial-gradient(circle at top right, rgba(30,64,175,0.35), transparent 35%),
+            linear-gradient(180deg, #0b1120 0%, #020617 45%, #020617 100%);
+    }
+
+    .records-container {
+        width: min(1450px, 94%);
+        margin: auto;
+    }
+
+    .records-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .records-title h1 {
+        font-size: 46px;
+        font-weight: 950;
+        margin: 0;
+        color: #ffffff;
+    }
+
+    .records-title p {
+        color: #9ca3af;
+        margin-top: 10px;
+        margin-bottom: 0;
+        font-size: 16px;
+    }
+
+    .stream-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 20px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.2s ease;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .stream-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary-stream {
+        background: #2563eb;
+        color: white;
+        box-shadow: 0 12px 28px rgba(37,99,235,0.30);
+    }
+
+    .btn-primary-stream:hover {
+        background: #1d4ed8;
+        color: white;
+    }
+
+    .btn-light-stream {
+        background: rgba(255,255,255,0.10);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .btn-light-stream:hover {
+        background: rgba(255,255,255,0.18);
+        color: white;
+    }
+
+    .btn-warning-stream {
+        background: #f59e0b;
+        color: #111827;
+    }
+
+    .btn-warning-stream:hover {
+        background: #d97706;
+        color: #111827;
+    }
+
+    .btn-danger-stream {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn-danger-stream:hover {
+        background: #b91c1c;
+        color: white;
+    }
+
+    .btn-success-stream {
+        background: #16a34a;
+        color: white;
+    }
+
+    .btn-success-stream:hover {
+        background: #15803d;
+        color: white;
+    }
+
+    .filter-card {
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 28px;
+        padding: 24px;
+        margin-bottom: 30px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.40);
+        backdrop-filter: blur(14px);
+    }
+
+    .filter-card input,
+    .filter-card select {
+        background: #020617;
+        color: white;
+        border: 1px solid #334155;
+        border-radius: 16px;
+        height: 48px;
+    }
+
+    .filter-card input::placeholder {
+        color: #94a3b8;
+    }
+
+    .filter-card input:focus,
+    .filter-card select:focus {
+        background: #020617;
+        color: white;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59,130,246,0.14);
+    }
+
+    .table-card {
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(148, 163, 184, 0.20);
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 28px 75px rgba(0,0,0,0.48);
+    }
+
+    .table-dark-custom {
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        --bs-table-bg: #0f172a;
+        --bs-table-color: #e5e7eb;
+        --bs-table-border-color: #1e293b;
+        --bs-table-hover-bg: rgba(37, 99, 235, 0.16);
+        --bs-table-hover-color: #ffffff;
+        color: #e5e7eb;
+        background-color: #0f172a;
+    }
+
+    .table-dark-custom thead {
+        background: linear-gradient(90deg, #111827, #172554);
+    }
+
+    .table-dark-custom thead th {
+        color: #bfdbfe;
+        border-bottom: 1px solid #334155;
+        padding: 18px 16px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 900;
+    }
+
+    .table-dark-custom tbody tr {
+        background: #0f172a;
+        transition: 0.2s ease;
+    }
+
+    .table-dark-custom tbody tr:nth-child(even) {
+        background: #111c31;
+    }
+
+    .table-dark-custom tbody tr:hover {
+        background: rgba(37, 99, 235, 0.18);
+    }
+
+    .table-dark-custom tbody td {
+        border-bottom: 1px solid #1e293b;
+        padding: 18px 16px;
+        vertical-align: middle;
+        color: #dbeafe;
+    }
+
+    .title-cell {
+        font-weight: 950;
+        color: #ffffff !important;
+        min-width: 180px;
+    }
+
+    .badge-soft {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-size: 12px;
+        font-weight: 900;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .badge-movie {
+        color: #93c5fd;
+    }
+
+    .badge-series {
+        color: #c4b5fd;
+    }
+
+    .badge-vista {
+        color: #4ade80;
+    }
+
+    .badge-pendiente {
+        color: #fbbf24;
+    }
+
+    .rating {
+        color: #facc15;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        font-weight: 900;
+    }
+
+    .review-text {
+        max-width: 330px;
+        color: #cbd5e1;
+        line-height: 1.55;
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        min-width: 220px;
+    }
+
+    .small-btn {
+        padding: 7px 13px;
+        font-size: 12px;
+    }
+
+    .empty-box {
+        padding: 38px;
+        text-align: center;
+        color: #94a3b8;
+        background: #0f172a;
+    }
+
+    @@media (max-width: 900px) {
+        .records-title h1 {
+            font-size: 34px;
+        }
+
+        .table-card {
+            overflow-x: auto;
+        }
+
+        .table-dark-custom {
+            min-width: 1150px;
+        }
+    }
+</style>
+
+<div class="records-page">
+    <div class="records-container">
+
+        <div class="records-header">
+            <div class="records-title">
+                <h1>Todos los registros</h1>
+                <p>Consulta, filtra, edita y elimina el contenido guardado en tu catálogo.</p>
+            </div>
+
+            <div>
+                <a asp-action="Index" class="stream-btn btn-light-stream">Volver al catálogo</a>
+                <a asp-action="Create" class="stream-btn btn-primary-stream">Agregar nuevo</a>
+                <a asp-action="Estadisticas" class="stream-btn btn-light-stream">Estadísticas</a>
+            </div>
+        </div>
+
+        <form method="get" class="filter-card">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="buscar" value="@ViewBag.Buscar" placeholder="Buscar por título..." class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <select name="tipo" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="Película" selected="@(ViewBag.Tipo == "Película")">Película</option>
+                        <option value="Serie" selected="@(ViewBag.Tipo == "Serie")">Serie</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <input type="text" name="genero" value="@ViewBag.Genero" placeholder="Género..." class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <input type="text" name="plataforma" value="@ViewBag.Plataforma" placeholder="Plataforma..." class="form-control" />
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="stream-btn btn-primary-stream">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-card">
+            @if (Model.Any())
+            {
+                <table class="table table-dark-custom">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Género</th>
+                            <th>Año</th>
+                            <th>Plataforma</th>
+                            <th>Estado</th>
+                            <th>Calificación</th>
+                            <th>Reseña</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="title-cell">@item.Titulo</td>
+
+                                <td>
+                                    <span class="badge-soft @(item.Tipo == "Serie" ? "badge-series" : "badge-movie")">
+                                        @item.Tipo
+                                    </span>
+                                </td>
+
+                                <td>@item.Genero</td>
+                                <td>@item.Anio_estreno</td>
+                                <td>@item.Plataforma</td>
+
+                                <td>
+                                    <span class="badge-soft @(item.Estado == "Vista" ? "badge-vista" : "badge-pendiente")">
+                                        @item.Estado
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="rating">@Estrellas(item.Calificacion)</span>
+                                </td>
+
+                                <td>
+                                    <div class="review-text">
+                                        @item.Resenia
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="actions-cell">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="stream-btn btn-light-stream small-btn">Ver</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="stream-btn btn-warning-stream small-btn">Editar</a>
+
+                                        @if (item.Estado == "Pendiente")
+                                        {
+                                            <a asp-action="MarcarVisto" asp-route-id="@item.Id" class="stream-btn btn-success-stream small-btn">Vista</a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="MarcarPendiente" asp-route-id="@item.Id" class="stream-btn btn-light-stream small-btn">Pendiente</a>
+                                        }
+
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Quitar de registros</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-box">
+                    No hay registros disponibles con los filtros seleccionados.
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

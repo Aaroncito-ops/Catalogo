@@ -1,0 +1,105 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+.cine-brand-zone {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.cine-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.cine-logo-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6d5dfc, #2563eb);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35);
+}
+
+.cine-logo-text {
+    color: #ffffff;
+    font-size: 1.45rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.cine-logo-text span {
+    color: #8ecbff;
+}
+
+.cine-type-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cine-type-button {
+    text-decoration: none;
+    color: #dbeafe;
+    font-weight: 800;
+    font-size: 0.92rem;
+    padding: 9px 17px;
+    border-radius: 999px;
+    border: 1px solid rgba(142, 203, 255, 0.25);
+    background: rgba(255, 255, 255, 0.055);
+    transition: 0.2s ease;
+}
+
+.cine-type-button:hover {
+    color: white;
+    background: rgba(37, 99, 235, 0.85);
+    border-color: rgba(142, 203, 255, 0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25);
+}
+
+@media (max-width: 768px) {
+    .cine-brand-zone {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .cine-type-buttons {
+        flex-wrap: wrap;
+    }
+}

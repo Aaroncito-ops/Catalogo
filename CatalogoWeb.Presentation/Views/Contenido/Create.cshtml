@@ -1,0 +1,336 @@
+@model CatalogoWeb.Entities.Contenido
+
+@{
+    ViewData["Title"] = "Agregar contenido";
+    var tipoActual = string.IsNullOrWhiteSpace(Model?.Tipo) ? "Película" : Model.Tipo;
+    var estadoActual = string.IsNullOrWhiteSpace(Model?.Estado) ? "Pendiente" : Model.Estado;
+    var serie = Model as CatalogoWeb.Entities.Serie;
+}
+
+<style>
+    body {
+        background: #020617;
+        color: #ffffff;
+    }
+
+    .form-page {
+        min-height: 100vh;
+        padding: 55px 0 75px 0;
+        background:
+            radial-gradient(circle at top left, rgba(37,99,235,0.28), transparent 34%),
+            radial-gradient(circle at top right, rgba(124,58,237,0.20), transparent 30%),
+            #020617;
+    }
+
+    .form-container {
+        width: min(1050px, 94%);
+        margin: auto;
+    }
+
+    .form-header {
+        margin-bottom: 28px;
+    }
+
+    .form-header h1 {
+        font-size: 44px;
+        font-weight: 950;
+        margin-bottom: 8px;
+    }
+
+    .form-header p {
+        color: #94a3b8;
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .form-card {
+        background: rgba(15, 23, 42, 0.94);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 30px;
+        padding: 32px;
+        box-shadow: 0 28px 70px rgba(0,0,0,0.42);
+        backdrop-filter: blur(12px);
+    }
+
+    .form-label {
+        color: #dbeafe;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .form-control,
+    .form-select {
+        background: #020617;
+        color: white;
+        border: 1px solid #334155;
+        border-radius: 15px;
+        min-height: 48px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background: #020617;
+        color: white;
+        border-color: #3b82f6;
+        box-shadow: none;
+    }
+
+    .form-control::placeholder {
+        color: #64748b;
+    }
+
+    textarea.form-control {
+        min-height: 130px;
+        resize: vertical;
+    }
+
+    .stream-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 12px 24px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.2s ease;
+    }
+
+    .stream-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary-stream {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-primary-stream:hover {
+        background: #1d4ed8;
+        color: white;
+    }
+
+    .btn-light-stream {
+        background: rgba(255,255,255,0.12);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .btn-light-stream:hover {
+        background: rgba(255,255,255,0.22);
+        color: white;
+    }
+
+    .alert-dark-custom {
+        background: rgba(220, 38, 38, 0.16);
+        border: 1px solid rgba(248, 113, 113, 0.35);
+        color: #fecaca;
+        border-radius: 18px;
+        padding: 16px 18px;
+        margin-bottom: 22px;
+        font-weight: 700;
+    }
+
+    .section-mini-title {
+        margin-top: 20px;
+        margin-bottom: 16px;
+        color: #93c5fd;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .side-note {
+        background: rgba(2, 6, 23, 0.7);
+        border: 1px solid #1e293b;
+        border-radius: 24px;
+        padding: 22px;
+        height: 100%;
+    }
+
+    .side-note h3 {
+        font-weight: 900;
+        margin-bottom: 12px;
+    }
+
+    .side-note p {
+        color: #94a3b8;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .preview-box {
+        height: 260px;
+        border-radius: 24px;
+        background:
+            linear-gradient(0deg, rgba(2,6,23,0.95), rgba(2,6,23,0.25)),
+            url('https://picsum.photos/seed/nuevoContenido/700/900');
+        background-size: cover;
+        background-position: center;
+        border: 1px solid rgba(255,255,255,0.12);
+        margin-bottom: 18px;
+        display: flex;
+        align-items: end;
+        padding: 20px;
+        font-size: 24px;
+        font-weight: 950;
+    }
+
+    @@media (max-width: 900px) {
+        .form-header h1 {
+            font-size: 34px;
+        }
+
+        .form-card {
+            padding: 24px;
+        }
+    }
+</style>
+
+<div class="form-page">
+    <div class="form-container">
+
+        <div class="form-header">
+            <h1>Agregar nuevo contenido</h1>
+            <p>Registra una película o serie dentro de tu catálogo estilo streaming.</p>
+        </div>
+
+        <div class="form-card">
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert-dark-custom">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <form asp-action="Create" method="post">
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="section-mini-title">Información principal</div>
+
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Título</label>
+                                <input type="text" name="Titulo" value="@Model?.Titulo" class="form-control" placeholder="Ejemplo: Interstellar" required />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo</label>
+                                <select name="Tipo" id="tipoSelect" class="form-select" required>
+                                    <option value="Película" selected="@(tipoActual == "Película" ? "selected" : null)">Película</option>
+                                    <option value="Serie" selected="@(tipoActual == "Serie" ? "selected" : null)">Serie</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Género</label>
+                                <input type="text" name="Genero" value="@Model?.Genero" class="form-control" placeholder="Acción, drama, terror..." required />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Año de estreno</label>
+                                <input type="number" name="Anio_estreno" value="@(Model?.Anio_estreno == 0 ? DateTime.Now.Year : Model?.Anio_estreno)" class="form-control" min="1900" max="@DateTime.Now.Year" required />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Plataforma</label>
+                                <input type="text" name="Plataforma" value="@Model?.Plataforma" class="form-control" placeholder="Netflix, Prime Video..." required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Estado</label>
+                                <select name="Estado" class="form-select" required>
+                                    <option value="Pendiente" selected="@(estadoActual == "Pendiente" ? "selected" : null)">Pendiente</option>
+                                    <option value="Vista" selected="@(estadoActual == "Vista" ? "selected" : null)">Vista</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Calificación</label>
+                                <select name="Calificacion" class="form-select" required>
+                                    <option value="1" selected="@(Model?.Calificacion == 1 ? "selected" : null)">1 estrella</option>
+                                    <option value="2" selected="@(Model?.Calificacion == 2 ? "selected" : null)">2 estrellas</option>
+                                    <option value="3" selected="@(Model?.Calificacion == 3 || Model?.Calificacion == 0 ? "selected" : null)">3 estrellas</option>
+                                    <option value="4" selected="@(Model?.Calificacion == 4 ? "selected" : null)">4 estrellas</option>
+                                    <option value="5" selected="@(Model?.Calificacion == 5 ? "selected" : null)">5 estrellas</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="serieFields">
+                            <div class="section-mini-title">Datos de serie</div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Temporadas</label>
+                                    <input type="number" name="Temporadas" value="@(serie?.Temporadas ?? 0)" class="form-control" min="0" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Episodios</label>
+                                    <input type="number" name="Episodios" value="@(serie?.Episodios ?? 0)" class="form-control" min="0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-mini-title">Reseña</div>
+
+                        <div>
+                            <label class="form-label">Reseña breve</label>
+                            <textarea name="Resenia" class="form-control" placeholder="Escribe una reseña breve del contenido...">@Model?.Resenia</textarea>
+                        </div>
+
+                        <div class="actions">
+                            <button type="submit" class="stream-btn btn-primary-stream">Guardar contenido</button>
+                            <a asp-action="Index" class="stream-btn btn-light-stream">Volver al catálogo</a>
+                            <a asp-action="Registros" class="stream-btn btn-light-stream">Ver registros</a>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="side-note">
+                            <div class="preview-box">
+                                Nuevo estreno
+                            </div>
+
+                            <h3>Catálogo personal</h3>
+                            <p>
+                                Aquí puedes registrar series o películas con su género, plataforma, estado, calificación y reseña. 
+                                El estado puede quedar como pendiente y después cambiarse desde la vista de detalle.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const tipoSelect = document.getElementById("tipoSelect");
+    const serieFields = document.getElementById("serieFields");
+
+    function actualizarCamposSerie() {
+        if (tipoSelect.value === "Serie") {
+            serieFields.style.display = "block";
+        } else {
+            serieFields.style.display = "none";
+        }
+    }
+
+    tipoSelect.addEventListener("change", actualizarCamposSerie);
+    actualizarCamposSerie();
+</script>
