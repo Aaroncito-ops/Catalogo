@@ -1,5 +1,5 @@
 using CatalogoWeb.Entities;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -13,21 +13,21 @@ namespace CatalogoWeb.Data
         public ContenidoRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? "Server=(localdb)\\mssqllocaldb;Database=CatalogoWebDB;Trusted_Connection=True;TrustServerCertificate=True";
+                ?? "Data Source=catalogo.db";
         }
 
         public List<Contenido> ObtenerTodos()
         {
             var contenidos = new List<Contenido>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
             {
-                string query = "SELECT Id, Titulo, Tipo, Genero, Anio_estreno, Plataforma, Estado, Calificacion, Resenia, Temporadas, Episodios, EsAgregadoPorUsuario FROM dbo.Contenidos";
-                SqlCommand command = new SqlCommand(query, connection);
+                string query = "SELECT Id, Titulo, Tipo, Genero, Anio_estreno, Plataforma, Estado, Calificacion, Resenia, Temporadas, Episodios, EsAgregadoPorUsuario FROM Contenidos";
+                SqliteCommand command = new SqliteCommand(query, connection);
 
                 connection.Open();
 
-                using (SqlDataReader reader = command.ExecuteReader())
+                using (SqliteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -41,15 +41,15 @@ namespace CatalogoWeb.Data
 
         public Contenido? ObtenerPorId(int id)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
             {
-                string query = "SELECT Id, Titulo, Tipo, Genero, Anio_estreno, Plataforma, Estado, Calificacion, Resenia, Temporadas, Episodios, EsAgregadoPorUsuario FROM dbo.Contenidos WHERE Id = @Id";
-                SqlCommand command = new SqlCommand(query, connection);
+                string query = "SELECT Id, Titulo, Tipo, Genero, Anio_estreno, Plataforma, Estado, Calificacion, Resenia, Temporadas, Episodios, EsAgregadoPorUsuario FROM Contenidos WHERE Id = @Id";
+                SqliteCommand command = new SqliteCommand(query, connection);
                 command.Parameters.AddWithValue("@Id", id);
 
                 connection.Open();
 
-                using (SqlDataReader reader = command.ExecuteReader())
+                using (SqliteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
@@ -63,14 +63,14 @@ namespace CatalogoWeb.Data
 
         public void Agregar(Contenido contenido)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
             {
-                string query = @"INSERT INTO dbo.Contenidos 
+                string query = @"INSERT INTO Contenidos 
                                 (Titulo, Tipo, Genero, Anio_estreno, Plataforma, Estado, Calificacion, Resenia, Temporadas, Episodios, EsAgregadoPorUsuario) 
                                 VALUES 
                                 (@Titulo, @Tipo, @Genero, @Anio_estreno, @Plataforma, @Estado, @Calificacion, @Resenia, @Temporadas, @Episodios, @EsAgregadoPorUsuario)";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqliteCommand command = new SqliteCommand(query, connection);
                 AddParameters(command, contenido);
 
                 connection.Open();
@@ -80,9 +80,9 @@ namespace CatalogoWeb.Data
 
         public void Actualizar(Contenido contenido)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
             {
-                string query = @"UPDATE dbo.Contenidos 
+                string query = @"UPDATE Contenidos 
                                 SET Titulo = @Titulo,
                                     Tipo = @Tipo,
                                     Genero = @Genero,
@@ -96,7 +96,7 @@ namespace CatalogoWeb.Data
                                     EsAgregadoPorUsuario = @EsAgregadoPorUsuario
                                 WHERE Id = @Id";
 
-                SqlCommand command = new SqlCommand(query, connection);
+                SqliteCommand command = new SqliteCommand(query, connection);
                 command.Parameters.AddWithValue("@Id", contenido.Id);
                 AddParameters(command, contenido);
 
@@ -107,10 +107,10 @@ namespace CatalogoWeb.Data
 
         public void Eliminar(int id)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
             {
-                string query = "DELETE FROM dbo.Contenidos WHERE Id = @Id";
-                SqlCommand command = new SqlCommand(query, connection);
+                string query = "DELETE FROM Contenidos WHERE Id = @Id";
+                SqliteCommand command = new SqliteCommand(query, connection);
                 command.Parameters.AddWithValue("@Id", id);
 
                 connection.Open();
@@ -118,7 +118,7 @@ namespace CatalogoWeb.Data
             }
         }
 
-        private Contenido MapReaderToContenido(SqlDataReader reader)
+        private Contenido MapReaderToContenido(SqliteDataReader reader)
         {
             string tipo = reader["Tipo"].ToString() ?? string.Empty;
             Contenido contenido;
@@ -145,12 +145,12 @@ namespace CatalogoWeb.Data
             contenido.Estado = reader["Estado"].ToString() ?? string.Empty;
             contenido.Calificacion = Convert.ToInt32(reader["Calificacion"]);
             contenido.Resenia = reader["Resenia"].ToString() ?? string.Empty;
-            contenido.EsAgregadoPorUsuario = reader["EsAgregadoPorUsuario"] != DBNull.Value && Convert.ToBoolean(reader["EsAgregadoPorUsuario"]);
+            contenido.EsAgregadoPorUsuario = reader["EsAgregadoPorUsuario"] != DBNull.Value && Convert.ToInt32(reader["EsAgregadoPorUsuario"]) == 1;
 
             return contenido;
         }
 
-        private void AddParameters(SqlCommand command, Contenido contenido)
+        private void AddParameters(SqliteCommand command, Contenido contenido)
         {
             command.Parameters.AddWithValue("@Titulo", contenido.Titulo);
             command.Parameters.AddWithValue("@Tipo", contenido.Tipo);
@@ -160,7 +160,7 @@ namespace CatalogoWeb.Data
             command.Parameters.AddWithValue("@Estado", contenido.Estado);
             command.Parameters.AddWithValue("@Calificacion", contenido.Calificacion);
             command.Parameters.AddWithValue("@Resenia", (object)contenido.Resenia ?? DBNull.Value);
-            command.Parameters.AddWithValue("@EsAgregadoPorUsuario", contenido.EsAgregadoPorUsuario);
+            command.Parameters.AddWithValue("@EsAgregadoPorUsuario", contenido.EsAgregadoPorUsuario ? 1 : 0);
 
             if (contenido is Serie serie)
             {
